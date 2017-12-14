@@ -37,34 +37,26 @@
     foreach((array)$obj as $key => $val){
         if(strcmp($key, "total_hit_count" ) == 0 ){
             echo "トータルヒット件数:".$val;
-            if($val > 10){
-              $z = 15;
-            }
-            if($val > 30){
-              $z = 14;
-            }
             echo nl2br("\n").nl2br("\n");
         }
         if(strcmp($key, "rest") == 0){
             foreach((array)$val as $restArray){
                 $markerData += array((string)$restArray->{'name'} => array('lat' => $restArray->{'latitude'},'lon' => $restArray->{'longitude'},
                 'url' => $restArray->{'url'}, 'category' => $restArray->{'category'}, 'walk' => $restArray->{'access'}->{'walk'}));
-                if (checkString($restArray->{'id'})) {
-            		    echo $restArray->{'id'};
-            		}
                 if (checkString($restArray->{'name'})) {
-            		    echo $restArray->{'name'};
-            		}
-                if (checkString($restArray->{'access'}->{'line'})){
-            		    echo (string)$restArray->{'access'}->{'line'};
-            		}
-                if (checkString($restArray->{'access'}->{'station'})) {
-            		    echo (string)$restArray->{'access'}->{'station'};
-            		}
-                if (checkString($restArray->{'access'}->{'walk'})) {
-            		    echo (string)$restArray->{'access'}->{'walk'}."分";
-            		}
+                    echo $restArray->{'name'};
+                }
+                if (checkString($restArray->{'name'})) {
+            		    echo "  電話番号".$restArray->{'tel'};
+            	}
+                if (checkString($restArray->{'name'})) {
+            		    echo "  カテゴリー".$restArray->{'category'};
+            	}
                 echo nl2br("\n");
+                if (checkString($restArray->{'url'})) {
+            		     echo "  URL:".$restArray->{'url'};
+            	}
+                echo nl2br("\n").nl2br("\n");
             }
         }
     }
