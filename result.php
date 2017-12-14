@@ -30,19 +30,24 @@
     //取得した結果をオブジェクト化
     $obj  = json_decode($json);
     $markerData = array();
-    $z = 16;
-
+    $zoom = 16;
     //結果をパース
     //トータルヒット件数、店舗番号、店舗名、最寄の路線、最寄の駅、最寄駅から店までの時間を出力
     foreach((array)$obj as $key => $val){
         if(strcmp($key, "total_hit_count" ) == 0 ){
             echo "トータルヒット件数:".$val;
+            if($val > 10){
+              $zoom = 15;
+            }
+            if($val > 30){
+              $zoom = 14;
+            }
             echo nl2br("\n").nl2br("\n");
         }
         if(strcmp($key, "rest") == 0){
             foreach((array)$val as $restArray){
                 $markerData += array((string)$restArray->{'name'} => array('lat' => $restArray->{'latitude'},'lon' => $restArray->{'longitude'},
-                'url' => $restArray->{'url'}, 'category' => $restArray->{'category'}, 'walk' => $restArray->{'access'}->{'walk'}));
+                'url' => $restArray->{'url'}, 'category' => $restArray->{'category'}, 'walk' => $restArray->{'access'}->{'walk'},'img' => $restArray->{'image_url'}->{'shop_image1'}));
                 if (checkString($restArray->{'name'})) {
                     echo $restArray->{'name'};
                 }
@@ -54,7 +59,7 @@
             	}
                 echo nl2br("\n");
                 if (checkString($restArray->{'url'})) {
-            		     echo "  URL:".$restArray->{'url'};
+            		     echo "  URL:"."<a href=\"".$restArray->{'url'}."\">".$restArray->{'url'}.'</a>';
             	}
                 echo nl2br("\n").nl2br("\n");
             }
@@ -87,11 +92,10 @@
     function initMap() {
       var uluru = {lat: <?php echo $lat ?>, lng: <?php echo $lon ?>};
       var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: <?php echo $z;?>,
+        zoom: <?php echo $zoom;?>,
         center: uluru
       });
       var i = 0;
-
       <?php foreach ($markerData as $key => $value): ?>
         markerLatLng = new google.maps.LatLng({lat: <?php echo $value['lat']; ?>, lng: <?php echo $value['lon']; ?>}); // 緯度経度のデータ作成
         marker[i] = new google.maps.Marker({ // マーカーの追加
@@ -102,7 +106,8 @@
          content: '<div class="sample">' + '<?php echo $key; ?>' + '<br>' +
          '<?php if (checkString($value["walk"])){echo $value["walk"];} ?>' + '分' + '<br>'
          + 'カテゴリー：' + '<?php if (checkString($value["category"])){echo (string)$value["category"];} ?>' + '<br>' +
-         '<a href=\"' + '<?php echo $value["url"]; ?>' + '\" target="blank"><?php echo $value["url"]; ?></a>' +
+         '<a href=\"' + '<?php echo $value["url"]; ?>' + '\" target="blank"><?php echo $value["url"]; ?></a>' + '<br>' +
+        '<?php if (checkString($value['img'])){echo "<img src=\"".(string)$value['img']."\"/>";}?>' +
         '</div>' // 吹き出しに表示する内容
        });
      markerEvent(i); // マーカーにクリックイベントを追加
